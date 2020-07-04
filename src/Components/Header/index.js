@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useState} from "react";
 
 import { Cabecalho } from "./styles";
 
 import Logo from "../../assets/surfbot-logo.svg";
 
 function Header({notmostsubheader}) {
+  const [openNav, setOpenNav] = useState(false)
   return (
     <Cabecalho>
       <div className={!notmostsubheader ? ("subheader") : ('none')}>
@@ -12,12 +13,19 @@ function Header({notmostsubheader}) {
       </div>
       
       <div className="header">
-        <a href="/">
-          <img src={Logo} alt="" />
-        </a>
+        <span className="head">
+          <a href="/">
+            <img src={Logo} alt="" />
 
-        <nav>
-          <ul>
+          </a>
+
+          <button className="btn-nav" onClick={() => setOpenNav(!openNav)}>
+            &#9776;
+          </button>
+        </span>
+
+        <nav className={openNav ?('open-nav') :('none')}>
+          <ul className={openNav ?('open-nav') :('')}>
             <li>
               <a href="/">Praia</a>
             </li>

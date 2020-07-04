@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import {useHistory} from 'react-router-dom'
+
 import Header from "../../Components/Header";
 
 import Bg from "../../assets/bg-intro.jpg";
@@ -12,32 +14,80 @@ import Prancha from "../../assets/surfbot-icon.svg";
 import BgIcons from "../../assets/bg-icones.svg";
 import PranchaWhite from "../../assets/surfbot-icon-white.svg";
 
+import api from "../../services/api";
+
 import { Container } from "./styles";
 
 function Home() {
+  const [email, setEmail] = useState("");
+  const [nome, setNome] = useState("");
+  const [emailContato, setEmailContato] = useState(""); 
+  const [messege, setMessege] = useState(""); 
+  const [matriculas, setMatricula] = useState([]);
+
+  const history = useHistory()
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    try {
+      await api.post("/send-email", { email }).then((messege) => {
+        console.log(messege);
+        alert("email enviado com sucesso!!");
+        setEmail("");
+      });
+    } catch (err) {
+      console.lof(err);
+    }
+  }
+
+  async function handleSubmitContato(e) {
+    e.preventDefault()
+    api.post('/contact', {nome, email:emailContato, messege}).then(() => alert('Email enviado com sucesso!'))
+  }
+
+  useEffect(() => {
+    try {
+      api.get("/matriculas").then((matricula) => setMatricula(matricula.data));
+    } catch (err) {
+      console.log(err);
+    }
+
+  }, []);
   return (
     <>
       <Header />
 
       <Container>
         <div className="main">
-          <img src={Bg} alt="" width="100%" height="80%" />
+          <img
+            src={Bg}
+            alt=""
+            width="100%"
+            height="80%"
+            style={{ minHeight: 200 }}
+          />
           <div className="content">
             <h1>Escola de Surf</h1>
 
-            <form>
-              <input type="text" placeholder="Email"/>
-              <button type="submit">MATRICULE-SE →</button>
+            <form onSubmit={handleSubmit}>
+              <input
+                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="Email"
+                value={email}
+              />
+              <button type="submit">MATRICULE-SE→</button>
             </form>
           </div>
         </div>
+        <br />
+        <br />
 
         <main className="conteudo">
-          <div className="images">
-            <div>
-              <img src={Pranchas} alt="" />
-              <img src={Mapa} alt="" className="image" />
-            </div>
+          <div className="images ordem2">
+            <img src={Pranchas} alt="" />
+            <img src={Mapa} alt="" className="image" />
           </div>
 
           <div className="texto">
@@ -77,9 +127,8 @@ function Home() {
             </p>
           </div>
 
-          <div className="chegar">
+          <div className="chegar ordem">
             <p>&#9675;Como chegar</p>
-            <br />
 
             <p>
               {" "}
@@ -112,71 +161,44 @@ function Home() {
           <h1>Aulas</h1>
 
           <div className="precos">
-            <div className="crianca preco">
-              <img src={Prancha} alt="" />
-              <h1>infantil</h1>
+            {matriculas.map((item, index) => (
+              <div className="crianca preco" key={item._id}>
+                {item.level === 1 &&(
+                  <img src={Prancha} alt="" />
+                )}
+                {item.level === 2 &&(
+                  <>
+                  <img src={Prancha} alt="" />
+                  <img src={Prancha} alt="" />
+                  </>
+                )}
+                {item.level === 3 &&(
+                  <>
+                  <img src={Prancha} alt="" />
+                  <img src={Prancha} alt="" />
+                  <img src={Prancha} alt="" />
+                  </>
+                )}
 
-              <span className="times">
-                <p>&#9675;Publico entre 5 e 15 anos</p>
-                <p>&#9675;Equipamentos fornecidos</p>
-                <p>&#9675;Horários de Sex. á Sab.</p>
-                <p>&#9675;2 horas seguidas de aula</p>
-              </span>
+                <h1 className="uppercase">{item.tipo}</h1>
 
-              <div className="blue">R$49,99/Aula</div>
+                <ul className="times">
+                  {item.roles.map(roles => (
+                    <li key={item.id}>{roles}</li>
+                  ))}
+                </ul>
 
-              <br />
-              <br />
+                  <div className="blue">R${item.valor}/Aula</div>
 
-              <button>
-                <span>MATRICULE-SE</span>
-                <span>→</span>
-              </button>
-            </div>
+                <br />
+                <br />
 
-            <div className="crianca preco">
-              <img src={Prancha} alt="" />
-              <h1>infantil</h1>
-
-              <span className="times">
-                <p>&#9675;Publico entre 5 e 15 anos</p>
-                <p>&#9675;Equipamentos fornecidos</p>
-                <p>&#9675;Horários de Sex. á Sab.</p>
-                <p>&#9675;2 horas seguidas de aula</p>
-              </span>
-
-              <div className="blue">R$49,99/Aula</div>
-
-              <br />
-              <br />
-
-              <button>
-                <span>MATRICULE-SE</span>
-                <span>→</span>
-              </button>
-            </div>
-
-            <div className="crianca preco">
-              <img src={Prancha} alt="" />
-              <h1>infantil</h1>
-
-              <span className="times">
-                <p>&#9675;Publico entre 5 e 15 anos</p>
-                <p>&#9675;Equipamentos fornecidos</p>
-                <p>&#9675;Horários de Sex. á Sab.</p>
-                <p>&#9675;2 horas seguidas de aula</p>
-              </span>
-
-              <div className="blue">R$49,99/Aula</div>
-
-              <br />
-              <br />
-
-              <button>
-                <span>MATRICULE-SE</span>
-                <span>→</span>
-              </button>
-            </div>
+                <button onClick={() => history.push(`/matricula/${item.level}`)}>
+                  <span>MATRICULE-SE</span>
+                  <span>→</span>
+                </button>
+              </div>
+            ))}
           </div>
           <span className="gruoup-people">
             <p>Possui um grupo com mais de 3 pessoas?</p>
@@ -193,17 +215,20 @@ function Home() {
           <h1>Contato</h1>
 
           <div className="row-contato">
-            <form>
-              <label htmlFor="nome">Nome
-              <input type="text" name="" id="nome"/>
+            <form onSubmit={handleSubmitContato}>
+              <label htmlFor="nome">
+                Nome
+                <input type="text" name="" id="nome" onChange={e => setNome(e.target.value)}/>
               </label>
 
-              <label htmlFor="email">Email
-              <input type="email" name="" id="email"/>
+              <label htmlFor="email">
+                Email
+                <input type="email" name="" id="email" onChange={e => setEmailContato(e.target.value)}/>
               </label>
 
-              <label htmlFor="mensagem">Mensagem
-              <textarea name="" id="mensagem" cols="30" rows="10"></textarea>
+              <label htmlFor="mensagem">
+                Mensagem
+                <textarea name="" id="mensagem" cols="30" rows="10" onChange={e => setMessege(e.target.value)}></textarea>
               </label>
 
               <button type="submit">ENVIAR MENSAGEM → </button>
@@ -219,8 +244,14 @@ function Home() {
               </div>
               <div className="email-telefone">
                 <strong>Email & telefone</strong>
-                <p><a href="mailto:joneivison355@gmail.com">joneivison355@gmail.com</a></p>
-                <p><a href="tel:+557399953301">+55 (73) 99955-3301</a></p>
+                <p>
+                  <a href="mailto:joneivison355@gmail.com">
+                    joneivison355@gmail.com
+                  </a>
+                </p>
+                <p>
+                  <a href="tel:+557399953301">+55 (73) 99955-3301</a>
+                </p>
               </div>
               <div className="horario">
                 <strong>Horário</strong>
@@ -229,7 +260,7 @@ function Home() {
               </div>
             </div>
 
-            <img src={BgIcons} alt=""/>
+            <img src={BgIcons} alt="" className="none" />
           </div>
         </div>
 
