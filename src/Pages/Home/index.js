@@ -41,7 +41,7 @@ function Home() {
     }
   }
 
-  async function handleSubmitContato(e) {
+  async function handleSubmitContato(e) { 
     e.preventDefault()
     api.post('/contact', {nome, email:emailContato, messege}).then(() => alert('Email enviado com sucesso!'))
   }
