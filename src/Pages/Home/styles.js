@@ -125,7 +125,6 @@ export const Container = styled.div`
 
         display: flex;
         align-items: center;
-        flex-wrap:wrap;
 
         img {
           margin: 0 20px 0 0;
@@ -305,7 +304,7 @@ export const Container = styled.div`
     text-align: center;
 
     @media (max-width: 778px) {
-      max-width: 50%;
+      max-width: 85%;
       margin: 0 auto;
     }
 

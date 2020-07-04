@@ -58,6 +58,7 @@ export const Cabecalho = styled.header`
         z-index:1000;
 
         align-self:flex-start;
+        background-color:#335D9E;
       }
       
       .none{
